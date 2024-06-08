@@ -2,15 +2,21 @@ package kr.co.dglee.study.config;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+import kr.co.dglee.study.filter.AuthFilter;
+import kr.co.dglee.study.provider.AuthProvider;
+import kr.co.dglee.study.service.MemberService;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -19,6 +25,23 @@ public class SecurityConfig {
   @Bean
   public BCryptPasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public AuthProvider authProvider(MemberService memberService) {
+    return new AuthProvider(memberService, passwordEncoder());
+  }
+
+  @Bean
+  public AuthenticationManager authenticationManager(AuthProvider authProvider) {
+    return new ProviderManager(authProvider);
+  }
+
+  @Bean
+  public AuthFilter customAuthFilter(AuthenticationManager authenticationManager) {
+    AuthFilter authFilter = new AuthFilter(authenticationManager);
+    authFilter.setFilterProcessesUrl("/auth/token");
+    return authFilter;
   }
 
   /**
@@ -41,7 +64,7 @@ public class SecurityConfig {
    * @throws Exception
    */
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthFilter authFilter) throws Exception {
 
     http
         .csrf(AbstractHttpConfigurer::disable)
@@ -50,7 +73,10 @@ public class SecurityConfig {
         .formLogin(AbstractHttpConfigurer::disable)
 
         .authorizeHttpRequests(auth -> auth
-            .anyRequest().authenticated());
+            .requestMatchers("/auth/token").permitAll()
+            .anyRequest().authenticated())
+
+        .addFilterAt(authFilter, UsernamePasswordAuthenticationFilter.class); // 기본 로그인 필터 대신 사용자 정의 로그인 필터를 사용
 
     return http.build();
   }
