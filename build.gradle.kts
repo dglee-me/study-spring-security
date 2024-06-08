@@ -15,6 +15,10 @@ java {
     }
 }
 
+ext {
+    set("tomcat.version", "10.1.24")
+}
+
 configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())

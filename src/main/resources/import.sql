@@ -1,0 +1,1 @@
+INSERT INTO member(email, username, password, role) VALUES ('dglee.dev@gmail.com', '이동근', '$2a$10$zN7z1o7C/lPpOWQMrDUAJOSz8X166SfR9GAjw1P600Zi/WUJVzili', 'ROLE_USER')
