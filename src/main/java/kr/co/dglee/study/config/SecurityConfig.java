@@ -5,6 +5,8 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 import kr.co.dglee.study.filter.AuthFilter;
 import kr.co.dglee.study.provider.AuthProvider;
 import kr.co.dglee.study.service.MemberService;
+import kr.co.dglee.study.utils.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +22,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+  private final JwtUtil jwtUtil;
 
   @Bean
   public BCryptPasswordEncoder passwordEncoder() {
@@ -39,7 +44,7 @@ public class SecurityConfig {
 
   @Bean
   public AuthFilter customAuthFilter(AuthenticationManager authenticationManager) {
-    AuthFilter authFilter = new AuthFilter(authenticationManager);
+    AuthFilter authFilter = new AuthFilter(authenticationManager, jwtUtil);
     authFilter.setFilterProcessesUrl("/auth/token");
     return authFilter;
   }

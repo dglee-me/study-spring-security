@@ -1,4 +1,8 @@
 spring:
+
+  auth:
+    token: 445bf8df03f7e885c90fcbd21c692d7d3531b9f6b7ac2d35c4d1c63b1dd746bf
+
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:study-security
