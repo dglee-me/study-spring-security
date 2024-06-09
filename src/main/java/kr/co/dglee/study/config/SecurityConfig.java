@@ -3,6 +3,7 @@ package kr.co.dglee.study.config;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 import kr.co.dglee.study.filter.AuthFilter;
+import kr.co.dglee.study.filter.JwtAuthFilter;
 import kr.co.dglee.study.provider.AuthProvider;
 import kr.co.dglee.study.service.MemberService;
 import kr.co.dglee.study.utils.JwtUtil;
@@ -81,6 +82,7 @@ public class SecurityConfig {
             .requestMatchers("/auth/token").permitAll()
             .anyRequest().authenticated())
 
+        .addFilterBefore(new JwtAuthFilter(jwtUtil), AuthFilter.class)        // 이메일/패스워드 인증 전 JWT 인증 필터를 먼저 사용
         .addFilterAt(authFilter, UsernamePasswordAuthenticationFilter.class); // 기본 로그인 필터 대신 사용자 정의 로그인 필터를 사용
 
     return http.build();

@@ -60,8 +60,13 @@ public class JwtUtil {
   }
 
   public boolean isExpired(String token) {
-
-    return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+    return Jwts.parser()
+        .verifyWith(key)
+        .build()
+        .parseSignedClaims(token)
+        .getPayload()
+        .getExpiration()
+        .before(new Date());
   }
 
   public String createToken(String category, String userName, String role) {
